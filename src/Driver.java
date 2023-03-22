@@ -25,14 +25,10 @@ public class Driver {
 
             printTree(tree);
 
-   			/*
    			for (int i = 0; i < tokens.size()-1; i++) {
    				System.out.println("Token Type: " + getTypeString(tokens.get(i).getType()));
    	   			System.out.println("Value: " + tokens.get(i).getText());
-   	   			//System.out.println(i);
-   				//System.out.println("eek")
-   				//parser.
-   			} */
+   			}
 
             System.out.println("Accepted");
 

@@ -4,6 +4,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.Map;
+import java.util.Stack;
+
 /**
  * This class provides an empty implementation of {@link LittleListener},
  * which can be extended to create a listener which only needs to handle a subset
@@ -11,34 +14,40 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  */
 @SuppressWarnings("CheckReturnValue")
 public class LittleBaseListener implements LittleListener {
-	/**PROGRAM test BEGIN
-	INT a,b,c;
-	FLOAT x,y,z;
-	VOID h,j,k;
-     --This line should cause a parse error
-	FUNCTION INT main() BEGIN
-	WRITE (a);
-	READ (b);
-	END
-	INT o,p;
-END
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterProgram(LittleParser.ProgramContext ctx) { }
+
+	private Stack<SymbolTable> symbolTableStack = new Stack<>();
+	private String currentVarType, currentID;
+
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitProgram(LittleParser.ProgramContext ctx) { }
+	@Override public void enterProgram(LittleParser.ProgramContext ctx) {
+		// push global symbol table to the stack
+		SymbolTable symbolTable = new SymbolTable("GLOBAL");
+		symbolTableStack.push(symbolTable);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterId(LittleParser.IdContext ctx) { }
+	@Override public void exitProgram(LittleParser.ProgramContext ctx) {
+		// should pop global symbol table
+		symbolTableStack.pop();
+	}
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterId(LittleParser.IdContext ctx) {
+		currentID = ctx.IDENTIFIER().getText();
+		if(currentVarType.equals(LittleObject.TYPE_INT) || currentVarType.equals(LittleObject.TYPE_FLOAT)){
+			symbolTableStack.peek().addEntry(currentID, new LittleObject(currentVarType, null));
+		}
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -86,19 +95,25 @@ END
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStr(LittleParser.StrContext ctx) { }
+	@Override public void enterStr(LittleParser.StrContext ctx) {
+		symbolTableStack.peek().addEntry(currentID, new LittleObject(currentVarType, ctx.STRINGLITERAL().getText()));
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStr(LittleParser.StrContext ctx) { }
+	@Override public void exitStr(LittleParser.StrContext ctx) {
+
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVar_decl(LittleParser.Var_declContext ctx) { }
+	@Override public void enterVar_decl(LittleParser.Var_declContext ctx) {
+		currentVarType = ctx.var_type().getText();
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -110,7 +125,9 @@ END
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVar_type(LittleParser.Var_typeContext ctx) { }
+	@Override public void enterVar_type(LittleParser.Var_typeContext ctx) {
+
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -206,7 +223,10 @@ END
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunc_decl(LittleParser.Func_declContext ctx) { }
+	@Override public void enterFunc_decl(LittleParser.Func_declContext ctx) {
+		SymbolTable symbolTable = new SymbolTable("SOME FUNCTION");
+		symbolTableStack.push(symbolTable);
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -224,7 +244,9 @@ END
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFunc_body(LittleParser.Func_bodyContext ctx) { }
+	@Override public void exitFunc_body(LittleParser.Func_bodyContext ctx) {
+		symbolTableStack.pop();
+	}
 	/**
 	 * {@inheritDoc}
 	 *

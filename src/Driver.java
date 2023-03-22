@@ -25,18 +25,17 @@ public class Driver {
 
             ParseTreeWalker walker = new ParseTreeWalker();
             walker.walk(new LittleBaseListener(), tree);
-            System.out.println("\n-- AFTER --");
 
    			/*for (int i = 0; i < tokens.size()-1; i++) {
    				System.out.println("Token Type: " + getTypeString(tokens.get(i).getType()));
    	   			System.out.println("Value: " + tokens.get(i).getText());
    			}*/
 
-            System.out.println("Accepted");
+            //System.out.println("Accepted");
 
         } catch (ParseCancellationException e) {
             //e.printStackTrace();
-            System.out.println("Not accepted");
+            //System.out.println("Not accepted");
             System.exit(0);
         } catch (IOException e) {
             // TODO Auto-generated catch block

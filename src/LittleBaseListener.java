@@ -28,7 +28,6 @@ public class LittleBaseListener implements LittleListener {
 	@Override public void enterProgram(LittleParser.ProgramContext ctx) {
 		// push global symbol table to the stack
 		SymbolTable symbolTable = new SymbolTable("GLOBAL");
-		System.out.println("Adding " + symbolTable.getName());
 		symbolTableStack.push(symbolTable);
 		symbolTables.add(symbolTable);
 	}
@@ -105,7 +104,6 @@ public class LittleBaseListener implements LittleListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterStr(LittleParser.StrContext ctx) {
-		System.out.println("ADDING A STRINGLIT " + ctx.STRINGLITERAL().getText());
 		symbolTableStack.peek().addEntry(currentID, new LittleObject(currentVarType, ctx.STRINGLITERAL().getText()));
 	}
 	/**
@@ -235,7 +233,6 @@ public class LittleBaseListener implements LittleListener {
 	 */
 	@Override public void enterFunc_decl(LittleParser.Func_declContext ctx) {
 		SymbolTable symbolTable = new SymbolTable(ctx.id().getText());
-		System.out.println("Adding " + symbolTable.getName());
 		symbolTableStack.push(symbolTable);
 		symbolTables.add(symbolTable);
 	}

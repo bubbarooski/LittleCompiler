@@ -23,12 +23,14 @@ public class Driver {
 
             ParseTree tree = parser.program();
 
-            printTree(tree);
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.walk(new LittleBaseListener(), tree);
+            System.out.println("\n-- AFTER --");
 
-   			for (int i = 0; i < tokens.size()-1; i++) {
+   			/*for (int i = 0; i < tokens.size()-1; i++) {
    				System.out.println("Token Type: " + getTypeString(tokens.get(i).getType()));
    	   			System.out.println("Value: " + tokens.get(i).getText());
-   			}
+   			}*/
 
             System.out.println("Accepted");
 
@@ -39,13 +41,6 @@ public class Driver {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             //e.printStackTrace();
-        }
-    }
-
-    public static void printTree(ParseTree root){
-        for(int i = 0; i < root.getChildCount(); i++){
-            System.out.println(root.getChild(i));
-            printTree(root.getChild(i));
         }
     }
 

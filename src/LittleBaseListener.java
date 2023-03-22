@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Stack;
 
@@ -15,6 +16,7 @@ import java.util.Stack;
 @SuppressWarnings("CheckReturnValue")
 public class LittleBaseListener implements LittleListener {
 
+	private ArrayList<SymbolTable> symbolTables = new ArrayList<>();
 	private Stack<SymbolTable> symbolTableStack = new Stack<>();
 	private String currentVarType, currentID;
 
@@ -26,7 +28,9 @@ public class LittleBaseListener implements LittleListener {
 	@Override public void enterProgram(LittleParser.ProgramContext ctx) {
 		// push global symbol table to the stack
 		SymbolTable symbolTable = new SymbolTable("GLOBAL");
+		System.out.println("Adding " + symbolTable.getName());
 		symbolTableStack.push(symbolTable);
+		symbolTables.add(symbolTable);
 	}
 	/**
 	 * {@inheritDoc}
@@ -36,6 +40,7 @@ public class LittleBaseListener implements LittleListener {
 	@Override public void exitProgram(LittleParser.ProgramContext ctx) {
 		// should pop global symbol table
 		symbolTableStack.pop();
+		printSymbolTables();
 	}
 	/**
 	 * {@inheritDoc}
@@ -44,6 +49,8 @@ public class LittleBaseListener implements LittleListener {
 	 */
 	@Override public void enterId(LittleParser.IdContext ctx) {
 		currentID = ctx.IDENTIFIER().getText();
+		// temporary fix for non string int or float ids
+		if(currentVarType == null) return;
 		if(currentVarType.equals(LittleObject.TYPE_INT) || currentVarType.equals(LittleObject.TYPE_FLOAT)){
 			symbolTableStack.peek().addEntry(currentID, new LittleObject(currentVarType, null));
 		}
@@ -83,7 +90,9 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterString_decl(LittleParser.String_declContext ctx) { }
+	@Override public void enterString_decl(LittleParser.String_declContext ctx) {
+		currentVarType = LittleObject.TYPE_STRING;
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -96,6 +105,7 @@ public class LittleBaseListener implements LittleListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterStr(LittleParser.StrContext ctx) {
+		System.out.println("ADDING A STRINGLIT " + ctx.STRINGLITERAL().getText());
 		symbolTableStack.peek().addEntry(currentID, new LittleObject(currentVarType, ctx.STRINGLITERAL().getText()));
 	}
 	/**
@@ -224,8 +234,10 @@ public class LittleBaseListener implements LittleListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void enterFunc_decl(LittleParser.Func_declContext ctx) {
-		SymbolTable symbolTable = new SymbolTable("SOME FUNCTION");
+		SymbolTable symbolTable = new SymbolTable(ctx.id().getText());
+		System.out.println("Adding " + symbolTable.getName());
 		symbolTableStack.push(symbolTable);
+		symbolTables.add(symbolTable);
 	}
 	/**
 	 * {@inheritDoc}
@@ -560,4 +572,11 @@ public class LittleBaseListener implements LittleListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void visitErrorNode(ErrorNode node) { }
+
+	public void printSymbolTables(){
+		for (SymbolTable symbolTable : symbolTables) {
+			symbolTable.printTable();
+			System.out.println();
+		}
+	}
 }

@@ -10,7 +10,7 @@ BEGIN
           INT n1;
           
           n1 := n;
-          
+
 		IF (n1 > 2)
 			RETURN F(n1-1)+F(n1-2);
 		ENDIF

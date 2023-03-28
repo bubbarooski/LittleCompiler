@@ -24,7 +24,7 @@ public class Driver {
             ParseTree tree = parser.program();
 
             ParseTreeWalker walker = new ParseTreeWalker();
-            walker.walk(new LittleBaseListener(), tree);
+            walker.walk(new SymbolTableBuilder(), tree);
 
    			/*for (int i = 0; i < tokens.size()-1; i++) {
    				System.out.println("Token Type: " + getTypeString(tokens.get(i).getType()));

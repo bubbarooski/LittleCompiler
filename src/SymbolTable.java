@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,14 +21,42 @@ public class SymbolTable {
         symbolTableMap.put(id, object);
     }
 
-    public void printTable(){
-        System.out.println("Symbol table " + name);
-        for(String key : keys){
-            System.out.print("name " + key + " type " + symbolTableMap.get(key).getType());
-            if(symbolTableMap.get(key).getType().equals(LittleObject.TYPE_STRING))
-                System.out.print(" value " + symbolTableMap.get(key).getValue());
+    public void printTable(OutputStreamWriter outputStreamWriter, boolean hasNewLine) throws Exception {
+        String keyAndTypeString, valueString;
 
+        String symbolTableString = "Symbol table " + name;
+
+        outputStreamWriter.write(symbolTableString);
+        System.out.print(symbolTableString);
+
+        if (keys.size() > 0) {
+            outputStreamWriter.write("\n");
             System.out.println();
+        }
+
+        int keyCounter = 1;
+
+        for (String key : keys) {
+            keyAndTypeString = "name " + key + " type " + symbolTableMap.get(key).getType();
+            outputStreamWriter.write(keyAndTypeString);
+            System.out.print(keyAndTypeString);
+
+            if (symbolTableMap.get(key).getType().equals(LittleObject.TYPE_STRING)) {
+                valueString = " value " + symbolTableMap.get(key).getValue();
+                outputStreamWriter.write(valueString);
+                System.out.print(valueString);
+            }
+
+            if (keyCounter != keys.size()) {
+                outputStreamWriter.write("\n");
+                System.out.println();
+            }
+            keyCounter++;
+        }
+
+        if (hasNewLine) {
+            outputStreamWriter.write("\n\n");
+            System.out.println("\n");
         }
     }
 }

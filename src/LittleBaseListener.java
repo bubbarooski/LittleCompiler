@@ -4,6 +4,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Stack;
@@ -21,6 +24,8 @@ public class LittleBaseListener implements LittleListener {
 	private String currentVarType, currentID;
 	private boolean startRecording = false;
 	private int blockCount = 1;
+	private String testOutFileName = "test.out";
+	private File file = new File(testOutFileName);
 
 	/**
 	 * {@inheritDoc}
@@ -39,7 +44,11 @@ public class LittleBaseListener implements LittleListener {
 	@Override public void exitProgram(LittleParser.ProgramContext ctx) {
 		// should pop global symbol table
 		symbolTableStack.pop();
-		printSymbolTables();
+		try {
+			printSymbolTables();
+		} catch (Exception e){
+
+		}
 	}
 	/**
 	 * {@inheritDoc}
@@ -588,11 +597,22 @@ public class LittleBaseListener implements LittleListener {
 	 */
 	@Override public void visitErrorNode(ErrorNode node) { }
 
-	public void printSymbolTables(){
+	public void printSymbolTables() throws Exception {
+		int symbolTableCounter = 1;
+		FileOutputStream fileOutputStream = new FileOutputStream(file);
+		OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
 		for (SymbolTable symbolTable : symbolTables) {
-			symbolTable.printTable();
-			System.out.println();
+			try{
+				if(symbolTableCounter != symbolTables.size())
+					symbolTable.printTable(outputStreamWriter, true);
+				else
+					symbolTable.printTable(outputStreamWriter, false);
+			} catch (Exception e){
+				System.out.println(e.getMessage());
+			}
+			symbolTableCounter++;
 		}
+		outputStreamWriter.close();
 	}
 
 	private void addNewSymbolTable(String tableName){

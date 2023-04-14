@@ -26,6 +26,8 @@ public class SymbolTableBuilder implements LittleListener {
 	private String testOutFileName = "test.out";
 	private File file = new File(testOutFileName);
 
+	private IRGenerator irGenerator = new IRGenerator();
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -616,6 +618,7 @@ public class SymbolTableBuilder implements LittleListener {
 
 	private void addNewSymbolTable(String tableName){
 		SymbolTable symbolTable = new SymbolTable(tableName);
+		symbolTableStack.peek().addEntry(symbolTable); // add new symbol table as a child of symbol table on top of stack
 		symbolTableStack.push(symbolTable);
 		symbolTables.add(symbolTable);
 	}

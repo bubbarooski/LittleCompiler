@@ -4,56 +4,74 @@ import java.util.Stack;
 
 public class IRGenerator {
 
-    LinkedList<LittleObject> tokenList = new LinkedList<>();
+    Stack<LittleObject> tokenStack = new Stack<>();
     ArrayList<String> irList = new ArrayList<>();
-    ArrayList<Integer> parenthesesLocations = new ArrayList<>();
-    ArrayList<Integer> multiplicationLocations = new ArrayList<>();
-    ArrayList<Integer> divisionLocations = new ArrayList<>();
-    ArrayList<Integer> additionLocations = new ArrayList<>();
-    ArrayList<Integer> subtractionLocations = new ArrayList<>();
-
     int temporaryCount = 0;
+    int parenthesesCount = 0;
 
     public IRGenerator(){
 
     }
 
     public void pushToken(LittleObject littleObject){
-        if(littleObject.getValue().equals(";")){
-            processTokenList(0, tokenList.size()-1);
-        } else {
-            checkForFlag(littleObject.getValue());
-            tokenList.add(littleObject);
-        }
+        if(littleObject.getValue().equals(";"))
+            processTokenStack(false);
+        else if(littleObject.getValue().equals(")"))
+            processTokenStack(true);
+        else
+            tokenStack.add(littleObject);
     }
 
-    private void processTokenList(int start, int end){
-        String token;
-
-        for(int i = start; i < end; i++){
-            token = tokenList.get(i).getValue();
+    private void processTokenStack(boolean forParentheses){
+        LittleObject poppedToken1, infixToken, poppedToken2;
+        if(forParentheses){
+            do{
+                poppedToken1 = tokenStack.pop();
+                infixToken = tokenStack.pop();
+                poppedToken2 = tokenStack.pop();
+            } while (!poppedToken1.getValue().equals("("));
+        } else {
+            do{
+                poppedToken1 = tokenStack.pop();
+                infixToken = tokenStack.pop();
+                poppedToken2 = tokenStack.pop();
+            } while (!tokenStack.empty());
         }
-
     }
     public ArrayList<String> getIR(){
         return irList;
     }
 
-    private void checkForFlag(String token){
-        if(token.equals("(")) parenthesesLocations.add(tokenList.size());
-        else if(token.equals(")")) parenthesesLocations.add(tokenList.size());
-        else if(token.equals("*")) multiplicationLocations.add(tokenList.size());
-        else if(token.equals("/")) divisionLocations.add(tokenList.size());
-        else if(token.equals("+")) additionLocations.add(tokenList.size());
-        else if(token.equals("-")) subtractionLocations.add(tokenList.size());
+    private IRCode generateSTOREI(String arg1, String arg2){
+        return new IRCode("STOREI", arg1, arg2, null);
     }
 
-    private String generateSTOREI(String i){
-        return "STOREI " + i + " $T"+temporaryCount;
+    private IRCode generateMULTI(String arg1, String arg2, String arg3){
+        return new IRCode("MULTI", arg1, arg2, arg3);
     }
 
-    private String generateMULTI(String i1, String i2){
-        return "MULTI " + i1 + " " + i2 + " $T"+temporaryCount;
+    private IRCode generateDIVI(String arg1, String arg2, String arg3){
+        return new IRCode("DIVI", arg1, arg2, arg3);
+    }
+
+    private IRCode generateADDI(String arg1, String arg2, String arg3){
+        return new IRCode("ADDI", arg1, arg2, arg3);
+    }
+
+    private IRCode generateSUBI(String arg1, String arg2, String arg3){
+        return new IRCode("SUBI", arg1, arg2, arg3);
+    }
+
+    private IRCode generateWRITEI(String arg1){
+        return new IRCode("WRITEI", arg1, null, null);
+    }
+
+    private IRCode generateREADI(String arg1){
+        return new IRCode("READI", arg1, null, null);
+    }
+
+    private IRCode generateRET(){
+        return new IRCode("RET", null, null, null);
     }
 
 }

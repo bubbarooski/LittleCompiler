@@ -26,7 +26,7 @@ public class SymbolTableBuilder implements LittleListener {
 	private String testOutFileName = "test.out";
 	private File file = new File(testOutFileName);
 
-	private IRGenerator irGenerator = new IRGenerator();
+	private IRCGenerator ircGenerator = new IRCGenerator();
 
 	/**
 	 * {@inheritDoc}
@@ -597,6 +597,12 @@ public class SymbolTableBuilder implements LittleListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void visitErrorNode(ErrorNode node) { }
+
+	public void printIRC(){
+		for(IRCode irCode : ircGenerator.getIR()){
+			System.out.println(irCode);
+		}
+	}
 
 	public void printSymbolTables() throws Exception {
 		int symbolTableCounter = 1;

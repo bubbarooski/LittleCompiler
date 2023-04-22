@@ -4,13 +4,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Stack;
-
 /**
  * This class provides an empty implementation of {@link LittleListener},
  * which can be extended to create a listener which only needs to handle a subset
@@ -18,51 +11,24 @@ import java.util.Stack;
  */
 @SuppressWarnings("CheckReturnValue")
 public class LittleBaseListener implements LittleListener {
-
-	private ArrayList<SymbolTable> symbolTables = new ArrayList<>();
-	private Stack<SymbolTable> symbolTableStack = new Stack<>();
-	private String currentVarType, currentID;
-	private boolean startRecording = false;
-	private int blockCount = 1;
-	private String testOutFileName = "test.out";
-	private File file = new File(testOutFileName);
-
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterProgram(LittleParser.ProgramContext ctx) {
-		// push global symbol table to the stack
-		addNewSymbolTable("GLOBAL");
-	}
+	@Override public void enterProgram(LittleParser.ProgramContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitProgram(LittleParser.ProgramContext ctx) {
-		// should pop global symbol table
-		symbolTableStack.pop();
-		try {
-			printSymbolTables();
-		} catch (Exception e){
-
-		}
-	}
+	@Override public void exitProgram(LittleParser.ProgramContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterId(LittleParser.IdContext ctx) {
-		currentID = ctx.IDENTIFIER().getText();
-		// temporary fix for non string int or float ids
-		if(currentVarType == null) return;
-		if(startRecording && (currentVarType.equals(LittleObject.TYPE_INT) || currentVarType.equals(LittleObject.TYPE_FLOAT))){
-			symbolTableStack.peek().addEntry(currentID, new LittleObject(currentVarType, null));
-		}
-	}
+	@Override public void enterId(LittleParser.IdContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -98,9 +64,7 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterString_decl(LittleParser.String_declContext ctx) {
-		currentVarType = LittleObject.TYPE_STRING;
-	}
+	@Override public void enterString_decl(LittleParser.String_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -112,42 +76,31 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStr(LittleParser.StrContext ctx) {
-		symbolTableStack.peek().addEntry(currentID, new LittleObject(currentVarType, ctx.STRINGLITERAL().getText()));
-	}
+	@Override public void enterStr(LittleParser.StrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStr(LittleParser.StrContext ctx) {
-
-	}
+	@Override public void exitStr(LittleParser.StrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVar_decl(LittleParser.Var_declContext ctx) {
-		currentVarType = ctx.var_type().getText();
-		startRecording = true;
-	}
+	@Override public void enterVar_decl(LittleParser.Var_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitVar_decl(LittleParser.Var_declContext ctx) {
-		startRecording = false;
-	}
+	@Override public void exitVar_decl(LittleParser.Var_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVar_type(LittleParser.Var_typeContext ctx) {
-
-	}
+	@Override public void enterVar_type(LittleParser.Var_typeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -171,8 +124,7 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterId_list(LittleParser.Id_listContext ctx) {
-	}
+	@Override public void enterId_list(LittleParser.Id_listContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -208,18 +160,13 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParam_decl(LittleParser.Param_declContext ctx) {
-		currentVarType = ctx.var_type().getText();
-		startRecording = true;
-	}
+	@Override public void enterParam_decl(LittleParser.Param_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitParam_decl(LittleParser.Param_declContext ctx) {
-		startRecording = false;
-	}
+	@Override public void exitParam_decl(LittleParser.Param_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -249,9 +196,7 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunc_decl(LittleParser.Func_declContext ctx) {
-		addNewSymbolTable(ctx.id().getText());
-	}
+	@Override public void enterFunc_decl(LittleParser.Func_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -269,9 +214,7 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFunc_body(LittleParser.Func_bodyContext ctx) {
-		symbolTableStack.pop();
-	}
+	@Override public void exitFunc_body(LittleParser.Func_bodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -505,10 +448,7 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIf_stmt(LittleParser.If_stmtContext ctx) {
-		addNewSymbolTable("BLOCK " + blockCount);
-		blockCount++;
-	}
+	@Override public void enterIf_stmt(LittleParser.If_stmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -520,12 +460,7 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterElse_part(LittleParser.Else_partContext ctx) {
-		if (ctx.decl().size() != 0 && ctx.stmt_list().size() != 0) {
-			addNewSymbolTable("BLOCK " + blockCount);
-			blockCount++;
-		}
-	}
+	@Override public void enterElse_part(LittleParser.Else_partContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -561,10 +496,7 @@ public class LittleBaseListener implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterWhile_stmt(LittleParser.While_stmtContext ctx) {
-		addNewSymbolTable("BLOCK " + blockCount);
-		blockCount++;
-	}
+	@Override public void enterWhile_stmt(LittleParser.While_stmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -596,28 +528,4 @@ public class LittleBaseListener implements LittleListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void visitErrorNode(ErrorNode node) { }
-
-	public void printSymbolTables() throws Exception {
-		int symbolTableCounter = 1;
-		FileOutputStream fileOutputStream = new FileOutputStream(file);
-		OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-		for (SymbolTable symbolTable : symbolTables) {
-			try{
-				if(symbolTableCounter != symbolTables.size())
-					symbolTable.printTable(outputStreamWriter, true);
-				else
-					symbolTable.printTable(outputStreamWriter, false);
-			} catch (Exception e){
-				System.out.println(e.getMessage());
-			}
-			symbolTableCounter++;
-		}
-		outputStreamWriter.close();
-	}
-
-	private void addNewSymbolTable(String tableName){
-		SymbolTable symbolTable = new SymbolTable(tableName);
-		symbolTableStack.push(symbolTable);
-		symbolTables.add(symbolTable);
-	}
 }

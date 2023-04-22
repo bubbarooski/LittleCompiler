@@ -1,5 +1,3 @@
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +8,8 @@ public class SymbolTable {
     public HashMap<String, SymbolTable> childSymbolTableMap = new HashMap<>();
     private ArrayList<String> childSymbolTableKeys = new ArrayList<>();
     private ArrayList<String> keys = new ArrayList<>();
+
+    private SymbolTable parentSymbolTable = null;
     public SymbolTable(String name){
         this.name = name;
     }
@@ -67,5 +67,34 @@ public class SymbolTable {
             outputStreamWriter.write("\n\n");
             System.out.println("\n");
         }
+    }
+
+    public void setParentSymbolTable(SymbolTable parentSymbolTable){
+        this.parentSymbolTable = parentSymbolTable;
+    }
+
+    private LittleObject searchForObject(String id){
+        SymbolTable currentSymbolTable = this;
+        LittleObject object = currentSymbolTable.symbolTableMap.get(id);
+
+        while (object == null) {
+            object = currentSymbolTable.symbolTableMap.get(id);
+            if(currentSymbolTable.parentSymbolTable == null) break;
+            currentSymbolTable = parentSymbolTable;
+        }
+
+        return object;
+    }
+
+    public String lookupType(String id){
+        LittleObject object = searchForObject(id);
+        if (object == null) return null;
+        else return object.getType();
+    }
+
+    public String lookupValue(String id){
+        LittleObject object = searchForObject(id);
+        if (object == null) return null;
+        else return object.getValue();
     }
 }

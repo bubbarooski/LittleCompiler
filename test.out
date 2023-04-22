@@ -1,11 +1,7 @@
 Symbol table GLOBAL
-name greeting type STRING value "Hello, welcome to horsepower to horse converter."
-name inputPrompt type STRING value "Please input horsepower:"
-name nl type STRING value "\n"
-name horsePower type INT
-name horses type FLOAT
-name withString type STRING value "With "
-name horsePowerString type STRING value " horsepower, you have "
-name horsesString type STRING value " horses"
+name a type INT
+name b type INT
+name c type INT
+name d type INT
 
 Symbol table main

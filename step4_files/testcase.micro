@@ -1,0 +1,22 @@
+str greeting "Hello, welcome to horspower to horse converter."
+str inputPrompt "Please input horsepower:"
+str nl "\n"
+var horsepower
+var horses
+str withString "With "
+str horsePowerString " horsepower, you have "
+str horsesString " horses"
+sys writes greeting
+sys writes nl
+sys writes inputPrompt
+sys writes nl
+sys readr horsePower
+move 14.9 r0
+divr horsePower r0 ; r0 = horspower / r0
+move r0 horses
+sys writes withString
+sys writer horsePower
+sys writes horsePowerString
+sys writer horses
+sys writes horseString
+sys halt

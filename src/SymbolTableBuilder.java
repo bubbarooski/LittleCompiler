@@ -724,4 +724,18 @@ public class SymbolTableBuilder implements LittleListener {
 		symbolTableStack.push(symbolTable);
 		symbolTables.add(symbolTable);
 	}
+
+	public IRCode[] getIRCode(){
+		IRCode[] irCodeArray = new IRCode[ircGenerator.getDeclareIRC().size()+ircGenerator.getIRC().size()];
+		int i = 0;
+		for(IRCode declareIRCode: ircGenerator.getDeclareIRC()){
+			irCodeArray[i] = declareIRCode;
+			i++;
+		}
+		for(IRCode irCode : ircGenerator.getIRC()){
+			irCodeArray[i] = irCode;
+			i++;
+		}
+		return irCodeArray;
+	}
 }

@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -28,7 +29,10 @@ public class Driver {
             ParseTreeWalker walker = new ParseTreeWalker();
             walker.walk(symbolTableBuilder, tree);
 
-            symbolTableBuilder.printIRC();
+            IRCode[] irCodeArray = symbolTableBuilder.getIRCode(); // Shane: Iterate through this list and generate Tiny Assembly Code for each IR code
+            for(IRCode irCode : irCodeArray){
+                System.out.println(irCode);
+            }
    			/*for (int i = 0; i < tokens.size()-1; i++) {
    				System.out.println("Token Type: " + getTypeString(tokens.get(i).getType()));
    	   			System.out.println("Value: " + tokens.get(i).getText());

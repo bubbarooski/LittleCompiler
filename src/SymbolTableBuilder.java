@@ -29,7 +29,7 @@ public class SymbolTableBuilder implements LittleListener {
 	private String testOutFileName = "test.out";
 	private File file = new File(testOutFileName);
 
-	private boolean parenEncountered = true;
+	private boolean parenEncountered = false;
 
 	private IRCGenerator ircGenerator = new IRCGenerator();
 

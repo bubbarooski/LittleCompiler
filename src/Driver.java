@@ -30,9 +30,16 @@ public class Driver {
             walker.walk(symbolTableBuilder, tree);
 
             IRCode[] irCodeArray = symbolTableBuilder.getIRCode(); // Shane: Iterate through this list and generate Tiny Assembly Code for each IR code
-            for(IRCode irCode : irCodeArray){
-                System.out.println(irCode);
-            }
+            
+            System.out.println();
+            
+            TinyGenerator assembler = new TinyGenerator();
+      
+            
+            assembler.generateAssembly(irCodeArray); 
+            
+
+            
    			/*for (int i = 0; i < tokens.size()-1; i++) {
    				System.out.println("Token Type: " + getTypeString(tokens.get(i).getType()));
    	   			System.out.println("Value: " + tokens.get(i).getText());

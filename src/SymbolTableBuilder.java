@@ -8,7 +8,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class provides an empty implementation of {@link LittleListener},
@@ -25,6 +28,8 @@ public class SymbolTableBuilder implements LittleListener {
 	private int blockCount = 1;
 	private String testOutFileName = "test.out";
 	private File file = new File(testOutFileName);
+
+	private boolean parenEncountered = false;
 
 	private IRCGenerator ircGenerator = new IRCGenerator();
 
@@ -46,7 +51,7 @@ public class SymbolTableBuilder implements LittleListener {
 		// should pop global symbol table
 		symbolTableStack.pop();
 		try {
-			printSymbolTables();
+			//printSymbolTables();
 		} catch (Exception e){
 
 		}
@@ -81,13 +86,17 @@ public class SymbolTableBuilder implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPgm_body(LittleParser.Pgm_bodyContext ctx) { }
+	@Override public void exitPgm_body(LittleParser.Pgm_bodyContext ctx) {
+		ircGenerator.generateRET();
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDecl(LittleParser.DeclContext ctx) { }
+	@Override public void enterDecl(LittleParser.DeclContext ctx) {
+
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -101,13 +110,22 @@ public class SymbolTableBuilder implements LittleListener {
 	 */
 	@Override public void enterString_decl(LittleParser.String_declContext ctx) {
 		currentVarType = LittleObject.TYPE_STRING;
+		// lhs
+		ircGenerator.pushToken(new LittleObject(ctx.id().getText(), currentVarType, null));
+		// :=
+		ircGenerator.pushToken(new LittleObject(":=", null, null));
+		// "STRING VALUE"
+		ircGenerator.pushToken(new LittleObject(ctx.str().getText(), LittleObject.TYPE_STRING, null));
 	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitString_decl(LittleParser.String_declContext ctx) { }
+	@Override public void exitString_decl(LittleParser.String_declContext ctx) {
+		// ;
+		ircGenerator.pushToken(new LittleObject(";", null, null));
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -252,6 +270,8 @@ public class SymbolTableBuilder implements LittleListener {
 	 */
 	@Override public void enterFunc_decl(LittleParser.Func_declContext ctx) {
 		addNewSymbolTable(ctx.id().getText());
+		ircGenerator.generateLABEL(ctx.id().getText());
+		ircGenerator.generateLINK();
 	}
 	/**
 	 * {@inheritDoc}
@@ -320,13 +340,21 @@ public class SymbolTableBuilder implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAssign_stmt(LittleParser.Assign_stmtContext ctx) { }
+	@Override public void exitAssign_stmt(LittleParser.Assign_stmtContext ctx) {
+		ircGenerator.pushToken(new LittleObject(";", null, null));
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAssign_expr(LittleParser.Assign_exprContext ctx) { }
+	@Override public void enterAssign_expr(LittleParser.Assign_exprContext ctx) {
+		// lhs
+		ircGenerator.pushToken(new LittleObject(ctx.id().IDENTIFIER().getText(), null, null));
+		// :=
+		ircGenerator.pushToken(new LittleObject(":=", null, null));
+		// rhs in other methods such as primary, mulop, etc
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -338,25 +366,62 @@ public class SymbolTableBuilder implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRead_stmt(LittleParser.Read_stmtContext ctx) { }
+	@Override public void enterRead_stmt(LittleParser.Read_stmtContext ctx) {
+		String id;
+		LittleParser.Id_listContext parent = ctx.id_list();
+		if (!parent.id().isEmpty()) {
+			id = parent.id().IDENTIFIER().toString();
+			ircGenerator.determineRead(id, symbolTableStack.peek());
+		} else return;
+
+		LittleParser.Id_tailContext tailParent = parent.id_tail();
+
+		while(true){
+			if (!tailParent.id().isEmpty()) {
+				id = tailParent.id().get(0).getText();
+				ircGenerator.determineRead(id, symbolTableStack.peek());
+				tailParent = tailParent.id_tail(0);
+			} else break;
+		}
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRead_stmt(LittleParser.Read_stmtContext ctx) { }
+	@Override public void exitRead_stmt(LittleParser.Read_stmtContext ctx) {
+
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterWrite_stmt(LittleParser.Write_stmtContext ctx) { }
+	@Override public void enterWrite_stmt(LittleParser.Write_stmtContext ctx) {
+		String id;
+		LittleParser.Id_listContext parent = ctx.id_list();
+		if (!parent.id().isEmpty()) {
+			id = parent.id().IDENTIFIER().toString();
+			ircGenerator.determineWrite(id, symbolTableStack.peek());
+		} else return;
+
+		LittleParser.Id_tailContext tailParent = parent.id_tail();
+
+		while(true){
+			if (!tailParent.id().isEmpty()) {
+				id = tailParent.id().get(0).getText();
+				ircGenerator.determineWrite(id, symbolTableStack.peek());
+				tailParent = tailParent.id_tail(0);
+			} else break;
+		}
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitWrite_stmt(LittleParser.Write_stmtContext ctx) { }
+	@Override public void exitWrite_stmt(LittleParser.Write_stmtContext ctx) {
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -470,19 +535,42 @@ public class SymbolTableBuilder implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPrimary(LittleParser.PrimaryContext ctx) { }
+	@Override public void enterPrimary(LittleParser.PrimaryContext ctx) {
+		String primary = ctx.getText();
+		String type = symbolTableStack.peek().lookupType(primary);
+		if (type == null) {
+			if (primary.contains(".")) {
+				type = LittleObject.TYPE_FLOAT;
+			} else {
+				type = LittleObject.TYPE_INT;
+			}
+		}
+
+		if(primary.contains("(")) {
+			ircGenerator.pushToken(new LittleObject("(", null, null));
+			parenEncountered = true;
+		}
+		else ircGenerator.pushToken(new LittleObject(primary, type, null));
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPrimary(LittleParser.PrimaryContext ctx) { }
+	@Override public void exitPrimary(LittleParser.PrimaryContext ctx) {
+		if(parenEncountered){
+			ircGenerator.pushToken(new LittleObject(")", null, null));
+			parenEncountered = false;
+		}
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAddop(LittleParser.AddopContext ctx) { }
+	@Override public void enterAddop(LittleParser.AddopContext ctx) {
+		ircGenerator.pushToken(new LittleObject(ctx.getText(), null, null));
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -494,7 +582,9 @@ public class SymbolTableBuilder implements LittleListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMulop(LittleParser.MulopContext ctx) { }
+	@Override public void enterMulop(LittleParser.MulopContext ctx) {
+		ircGenerator.pushToken(new LittleObject(ctx.getText(), null, null));
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -599,8 +689,11 @@ public class SymbolTableBuilder implements LittleListener {
 	@Override public void visitErrorNode(ErrorNode node) { }
 
 	public void printIRC(){
-		for(IRCode irCode : ircGenerator.getIR()){
-			System.out.println(irCode);
+		for(IRCode declareIRCode: ircGenerator.getDeclareIRC()){
+			System.out.println(";" + declareIRCode);
+		}
+		for(IRCode irCode : ircGenerator.getIRC()){
+			System.out.println(";" + irCode);
 		}
 	}
 
@@ -624,8 +717,25 @@ public class SymbolTableBuilder implements LittleListener {
 
 	private void addNewSymbolTable(String tableName){
 		SymbolTable symbolTable = new SymbolTable(tableName);
-		symbolTableStack.peek().addEntry(symbolTable); // add new symbol table as a child of symbol table on top of stack
+		if(!symbolTableStack.empty()) {
+			symbolTable.setParentSymbolTable(symbolTableStack.peek()); // add top symbol table as parent of new symbol table
+			symbolTableStack.peek().addEntry(symbolTable); // add new symbol table as a child of symbol table on top of stack
+		}
 		symbolTableStack.push(symbolTable);
 		symbolTables.add(symbolTable);
+	}
+
+	public IRCode[] getIRCode(){
+		IRCode[] irCodeArray = new IRCode[ircGenerator.getDeclareIRC().size()+ircGenerator.getIRC().size()];
+		int i = 0;
+		for(IRCode declareIRCode: ircGenerator.getDeclareIRC()){
+			irCodeArray[i] = declareIRCode;
+			i++;
+		}
+		for(IRCode irCode : ircGenerator.getIRC()){
+			irCodeArray[i] = irCode;
+			i++;
+		}
+		return irCodeArray;
 	}
 }

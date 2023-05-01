@@ -103,11 +103,17 @@ public class TinyGenerator {
 				
 			}
 		}
-		
+
 		if(code.func == "STOREF") {
 			if(code.arg1.startsWith("$") == true) {
 				//System.out.println(code.arg2);
 				variables.add(code.arg2);
+				//temp = new TinyCode("var", code.arg2, null);    /////
+				//otc.add(temp);
+			} else if (!isInteger(code.arg1)) {
+				variables.add(code.arg2);
+				//temp = new TinyCode("var", code.arg2, null);    /////
+				//otc.add(temp);
 			}
 		}
 		

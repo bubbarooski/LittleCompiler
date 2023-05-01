@@ -224,7 +224,7 @@ public class TinyGenerator {
 		
 		if(code.func.equals("READF") == true) {
 			//System.out.printf("sys readf %s\n", code.arg1);
-			temp = new TinyCode("sys readf", code.arg1, null);
+			temp = new TinyCode("sys readr", code.arg1, null);
 			otc.add(temp);
 		}
 		

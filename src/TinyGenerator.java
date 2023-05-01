@@ -110,7 +110,7 @@ public class TinyGenerator {
 				variables.add(code.arg2);
 				//temp = new TinyCode("var", code.arg2, null);    /////
 				//otc.add(temp);
-			} else if (!isInteger(code.arg1)) {
+			} else if (isFloat(code.arg1)) {
 				variables.add(code.arg2);
 				//temp = new TinyCode("var", code.arg2, null);    /////
 				//otc.add(temp);
@@ -358,4 +358,14 @@ public class TinyGenerator {
 	        return false;
 	    }
 	}
+
+	public static boolean isFloat(String str) {
+		try {
+			Float.parseFloat(str);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+
 }

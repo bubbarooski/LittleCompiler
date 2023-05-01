@@ -1,0 +1,23 @@
+PROGRAM heightConversion
+BEGIN
+        FLOAT feet, inches, cm, temp1, temp2;
+        STRING newline := "\n";
+        FLOAT convFeet;
+        FLOAT convInches;
+
+        FUNCTION VOID main()
+        BEGIN
+        		convInches := 2.54;
+        		convFeet := 30.48;
+        		
+                READ(feet);
+        		READ(inches);
+        		
+        		temp1 := convFeet * feet;
+        		temp2 := convInches * inches;
+        		cm := temp1 + temp2;
+        		
+        		WRITE(cm, newline);
+        END
+
+END

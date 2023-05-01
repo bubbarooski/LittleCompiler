@@ -19,8 +19,6 @@ public class TinyOptimizer {
 			
 				if (isInteger(irc[i].arg1) && Integer.parseInt(irc[i].arg1) == 1) {
 					oneMap.put(irc[i+1].arg2, 1);
-					System.out.println(irc[i].arg2);
-					
 				}
 				
 				if (irc[i].arg2.compareTo(irc[i + 1].arg1) == 0) {
@@ -37,7 +35,6 @@ public class TinyOptimizer {
 				
 				if (isFloat(irc[i].arg1) && Float.parseFloat(irc[i].arg1) == 1) {
 					onefMap.put(irc[i+1].arg2, 1.0f);
-					System.out.println(irc[i].arg2);
 					
 				}
 				

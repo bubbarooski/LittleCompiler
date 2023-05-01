@@ -37,17 +37,10 @@ public class Driver {
             TinyOptimizer oirc = new TinyOptimizer(irCodeArray);
             
             IRCode[] oirCodeArray = IRCodeListToArray.convertIRCodeListToArray(oirc.oirc);
-            
+
             TinyGenerator assembler = new TinyGenerator();
             
             assembler.generateAssembly(oirCodeArray);
-            
-   			/*for (int i = 0; i < tokens.size()-1; i++) {
-   				System.out.println("Token Type: " + getTypeString(tokens.get(i).getType()));
-   	   			System.out.println("Value: " + tokens.get(i).getText());
-   			}*/
-
-            //System.out.println("Accepted");
 
         } catch (ParseCancellationException e) {
             //e.printStackTrace();

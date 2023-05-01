@@ -7,6 +7,7 @@ public class TinyOptimizer {
 	public List<String> littleLang = new ArrayList<String>();
 	public List<IRCode> oirc = new ArrayList<IRCode>();
 	HashMap<String, Integer> oneMap = new HashMap<>();
+	HashMap<String, Float> onefMap = new HashMap<>();
 	
 	public IRCode temp;
 	
@@ -22,7 +23,6 @@ public class TinyOptimizer {
 					oneMap.put(irc[i+1].arg2, 1);
 					System.out.println(irc[i].arg2);
 					
-					System.out.println("chuck");
 				}
 				
 				if (irc[i].arg2.compareTo(irc[i + 1].arg1) == 0) {
@@ -33,7 +33,15 @@ public class TinyOptimizer {
 				}
 			}
 			
+			/////////
+			
 			if (irc[i].func.compareTo("STOREF") == 0 && irc[i + 1].func.compareTo("STOREF") == 0) {
+				
+				if (isFloat(irc[i].arg1) && Float.parseFloat(irc[i].arg1) == 1) {
+					onefMap.put(irc[i+1].arg2, 1.0f);
+					System.out.println(irc[i].arg2);
+					
+				}
 				
 				if (irc[i].arg2.compareTo(irc[i + 1].arg1) == 0) {
 					temp = new IRCode("STOREF", irc[i].arg1, irc[i+1].arg2, null);
@@ -54,7 +62,6 @@ public class TinyOptimizer {
 			
 			if (irc[i].func.compareTo("MULTI") == 0) {
 				
-				System.out.println("Check");
 				if (oneMap.containsKey(irc[i].arg1) ) {
 					temp = new IRCode("STOREI", irc[i].arg2, irc[i].arg3, null);
 					oirc.add(temp);
@@ -75,6 +82,17 @@ public class TinyOptimizer {
 			}
 			
 			if (irc[i].func.compareTo("MULTF") == 0) {
+				if (onefMap.containsKey(irc[i].arg1) ) {
+					temp = new IRCode("STOREF", irc[i].arg2, irc[i].arg3, null);
+					oirc.add(temp);
+					continue;
+					
+				} else if (onefMap.containsKey(irc[i].arg2)) {
+					temp = new IRCode("STOREF", irc[i].arg1, irc[i].arg3, null);
+					oirc.add(temp);
+					continue;
+				}
+				
 				temp = new IRCode("MULTF", irc[i].arg1, irc[i].arg2, "$T0");
 				oirc.add(temp);
 				temp = new IRCode("STOREI", "$T0", irc[i+1].arg2, null);
@@ -101,8 +119,8 @@ public class TinyOptimizer {
 				continue;
 			}
 			
-			if (irc[i].func.compareTo("DIVF") == 0) {
-				temp = new IRCode("DIVF", irc[i].arg1, irc[i].arg2, "$T0");
+			if (irc[i].func.compareTo("DIVR") == 0) {
+				temp = new IRCode("DIVR", irc[i].arg1, irc[i].arg2, "$T0");
 				oirc.add(temp);
 				temp = new IRCode("STOREI", "$T0", irc[i+1].arg2, null);
 				oirc.add(temp);
@@ -123,6 +141,15 @@ public class TinyOptimizer {
 	public static boolean isInteger(String str) {
 	    try {
 	        Integer.parseInt(str);
+	        return true;
+	    } catch (NumberFormatException e) {
+	        return false;
+	    }
+	}
+	
+	public static boolean isFloat(String str) {
+	    try {
+	        Float.parseFloat(str);
 	        return true;
 	    } catch (NumberFormatException e) {
 	        return false;

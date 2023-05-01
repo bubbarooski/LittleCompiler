@@ -95,9 +95,18 @@ public class TinyOptimizer {
 				i++;
 				continue;
 			}
-			
+
 			if (irc[i].func.compareTo("ADDI") == 0) {
 				temp = new IRCode("ADDI", irc[i].arg1, irc[i].arg2, "$T0");
+				oirc.add(temp);
+				temp = new IRCode("STOREI", "$T0", irc[i+1].arg2, null);
+				oirc.add(temp);
+				i++;
+				continue;
+			}
+
+			if (irc[i].func.compareTo("ADDF") == 0) {
+				temp = new IRCode("ADDF", irc[i].arg1, irc[i].arg2, "$T0");
 				oirc.add(temp);
 				temp = new IRCode("STOREI", "$T0", irc[i+1].arg2, null);
 				oirc.add(temp);

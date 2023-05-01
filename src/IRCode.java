@@ -2,8 +2,6 @@ public class IRCode {
     public String func = "";
     public String arg1, arg2, arg3;
 
-    private StringBuilder stringBuilder = new StringBuilder();
-
     public IRCode(String func, String arg1, String arg2, String arg3){
         this.func = func;   //opcode
         this.arg1 = arg1;
@@ -13,6 +11,7 @@ public class IRCode {
 
     @Override
     public String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(this.func);
         if (this.arg1 != null) stringBuilder.append(" "+this.arg1);
         if (this.arg2 != null) stringBuilder.append(" "+this.arg2);

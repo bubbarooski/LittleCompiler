@@ -12,9 +12,7 @@ public class TinyOptimizer {
 	public IRCode temp;
 	
 	public TinyOptimizer(IRCode[] irc) {
-		
-		
-		
+
 		for (int i = 0; i < irc.length; i++) {
 			
 			if (irc[i].func.compareTo("STOREI") == 0 && irc[i + 1].func.compareTo("STOREI") == 0) {

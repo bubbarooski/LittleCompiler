@@ -38,16 +38,9 @@ public class Driver {
             
             IRCode[] oirCodeArray = IRCodeListToArray.convertIRCodeListToArray(oirc.oirc);
             
-            System.out.println();
-            ///
-            
             TinyGenerator assembler = new TinyGenerator();
-      
             
             assembler.generateAssembly(oirCodeArray);
-            
-            
-
             
    			/*for (int i = 0; i < tokens.size()-1; i++) {
    				System.out.println("Token Type: " + getTypeString(tokens.get(i).getType()));

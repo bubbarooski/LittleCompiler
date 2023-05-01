@@ -22,7 +22,6 @@ public class IRCGenerator {
         else if (littleObject.getId().equals(")"))
             processTokenStack();
         else {
-            System.out.println(littleObject);
             tokenStack.add(littleObject);
         }
     }
